@@ -33,16 +33,6 @@ project-root/
 `memory/` stores one markdown file per meaningful debug, fix, feature, refactor, or investigation session.
 `memory/` 用来按会话记录变更，每次有意义的 debug、fix、feature、refactor 或调查，都应落一个 markdown 文件。
 
-## Language Rules
-
-The skill itself is written in bilingual format, where each English paragraph is followed by its Chinese translation.
-这个 skill 本体采用中英双语对照格式，每段英文后面紧跟对应中文翻译。
-
-Generated `.psychRules` files use Chinese as the primary language, while filenames remain in English.
-生成的 `.psychRules` 文件内容以中文为主，但文件名保持英文。
-
-Git commit subjects should use a concise English conventional-commit style.
-git commit 标题应使用简洁的英文 conventional commit 风格。
 
 ## Scripts
 

@@ -46,4 +46,4 @@
 
 - 如果目标目录已有 git，优先沿用现有仓库。
 - 不要在多项目工作区或嵌套仓库结构中自动执行 `git init`，除非用户明确要求。
-- 执行 git 时在命令中加上：git -c safe.directory=path_of_workflow xxx
+- 执行 git 时优先使用：`git -c safe.directory=path_of_workflow -c core.sshCommand=C:/Windows/System32/OpenSSH/ssh.exe xxx`

@@ -23,6 +23,31 @@ def write_if_missing(path: Path, content: str) -> str:
     return f"create {path}"
 
 
+def _line_ignores_psychrules(line: str) -> bool:
+    stripped = line.strip()
+    if not stripped or stripped.startswith("#"):
+        return False
+    content = stripped.split("#", 1)[0].strip()
+    return ".psychRules" in content
+
+
+def ensure_psychrules_in_gitignore_if_present(gitignore_path: Path) -> str:
+    if not gitignore_path.exists():
+        return "skip .gitignore (missing, not created)"
+
+    existing = gitignore_path.read_text(encoding="utf-8")
+    if any(_line_ignores_psychrules(line) for line in existing.splitlines()):
+        return f"skip {gitignore_path}"
+
+    entry = ".psychRules/"
+    new_content = existing
+    if new_content and not new_content.endswith(("\n", "\r")):
+        new_content += "\n"
+    new_content += f"{entry}\n"
+    gitignore_path.write_text(new_content, encoding="utf-8")
+    return f"update {gitignore_path}"
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Initialize .psychRules and AGENTS.md")
     parser.add_argument("--root", required=True, help="Target project or workspace root")
@@ -79,6 +104,7 @@ def main() -> None:
             render(load_template(skill_root, "memory.template.md"), replacements),
         )
     )
+    actions.append(ensure_psychrules_in_gitignore_if_present(root / ".gitignore"))
 
     for action in actions:
         print(action)

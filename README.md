@@ -33,6 +33,9 @@ project-root/
 `memory/` stores one markdown file per meaningful debug, fix, feature, refactor, or investigation session.
 `memory/` 用来按会话记录变更，每次有意义的 debug、fix、feature、refactor 或调查，都应落一个 markdown 文件。
 
+The initializer also ensures the target root has `.gitignore` configured to ignore `.psychRules/`, because the folder may contain sensitive project context.
+初始化流程还会确保目标根目录的 `.gitignore` 已配置为忽略 `.psychRules/`，因为这个目录里可能包含敏感项目上下文。
+
 
 ## Scripts
 
@@ -44,25 +47,43 @@ project-root/
 
 ## Usage
 
+Natural-language usage is the primary interface.
+自然语言调用才是这个 skill 的主要使用方式。
+
+In Codex, the normal pattern is to tell the model what to initialize or maintain, and let the model use this skill to run the scripts and fill the generated files.
+在 Codex 里，正常模式是你直接告诉模型要初始化或维护哪个项目，再由模型调用这个 skill，执行脚本并补全生成出来的文件。
+
+Examples:
+示例：
+
+```text
+用 bootstrap-psychRules 为 xxx 初始化 .psychRules
+读取这个仓库的代码、README(如有)、 .psychRules/basic.md 和 .psychRules/rules.md
+为这次修复创建一条 memory，并询问我是否一起 commit
+```
+
+The scripts below are the implementation layer and are useful when you want to run the workflow manually.
+下面这些脚本命令属于实现层，适合你想手动执行这套流程时使用。
+
 Initialize a single project:
 初始化单一项目：
 
 ```powershell
-py -3 scripts/init_psych_rules.py --root "D:\your-project"
+py -3 scripts/init_psych_rules.py --root "/your-project"
 ```
 
 Initialize a multi-project workspace:
 初始化多项目工作区：
 
 ```powershell
-py -3 scripts/init_psych_rules.py --root "D:\your-workspace" --workspace
+py -3 scripts/init_psych_rules.py --root "/your-workspace" --workspace
 ```
 
 Create a new memory entry:
 创建一条新的 memory 记录：
 
 ```powershell
-py -3 scripts/new_memory_entry.py --root "D:\your-project" --kind fix --title "repair cache merge bug" --scope p-pop
+py -3 scripts/new_memory_entry.py --root "/your-project" --kind fix --title "repair cache merge bug" --scope p-pop
 ```
 
 ## Commit And Memory Sync
@@ -80,6 +101,9 @@ If the user asks to create a memory note for a code change but has not asked for
 
 This skill does not automatically run `git init` in nested or multi-project workspaces unless the user explicitly asks.
 这个 skill 不会在嵌套仓库或多项目工作区中自动执行 `git init`，除非用户明确要求。
+
+By default, `.psychRules/` should be treated as private memory rather than tracked source files.
+默认应把 `.psychRules/` 当成私有记忆，而不是需要被跟踪的源码文件。
 
 The safest pattern is to keep `.psychRules/` close to the project root that actually owns the code and git history.
 最稳妥的使用方式，是让 `.psychRules/` 尽量贴近真正拥有代码和 git 历史的项目根目录。

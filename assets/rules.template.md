@@ -5,6 +5,7 @@
 - `.psychRules/` 内文件名保持英文。
 - `.psychRules/` 内文件内容以中文为主。
 - 中文优先，英文仅作补充。
+- `.psychRules/` 可能包含敏感信息，默认不纳入版本控制。
 - git commit 标题默认使用英文 conventional commit 风格。
 
 ## 常用命令
@@ -46,4 +47,5 @@
 
 - 如果目标目录已有 git，优先沿用现有仓库。
 - 不要在多项目工作区或嵌套仓库结构中自动执行 `git init`，除非用户明确要求。
+- 确保 `.gitignore` 中包含：`.psychRules/`；如果没有 `.gitignore`，就先创建。
 - 执行 git 时优先使用：`git -c safe.directory=path_of_workflow -c core.sshCommand=C:/Windows/System32/OpenSSH/ssh.exe xxx`

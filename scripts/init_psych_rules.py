@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -46,6 +47,11 @@ def ensure_psychrules_in_gitignore_if_present(gitignore_path: Path) -> str:
     new_content += f"{entry}\n"
     gitignore_path.write_text(new_content, encoding="utf-8")
     return f"update {gitignore_path}"
+
+
+def safe_print(message: str) -> None:
+    encoding = sys.stdout.encoding or "utf-8"
+    sys.stdout.buffer.write((message + "\n").encode(encoding, errors="backslashreplace"))
 
 
 def main() -> None:
@@ -94,6 +100,12 @@ def main() -> None:
     )
     actions.append(
         write_if_missing(
+            psych_dir / "session.md",
+            render(load_template(skill_root, "session.template.md"), replacements),
+        )
+    )
+    actions.append(
+        write_if_missing(
             root / "AGENTS.md",
             render(load_template(skill_root, "agents.template.md"), replacements),
         )
@@ -104,10 +116,16 @@ def main() -> None:
             render(load_template(skill_root, "memory.template.md"), replacements),
         )
     )
+    actions.append(
+        write_if_missing(
+            memory_dir / "index.md",
+            render(load_template(skill_root, "memory-index.template.md"), replacements),
+        )
+    )
     actions.append(ensure_psychrules_in_gitignore_if_present(root / ".gitignore"))
 
     for action in actions:
-        print(action)
+        safe_print(action)
 
 
 if __name__ == "__main__":

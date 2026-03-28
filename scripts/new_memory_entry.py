@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import re
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -37,7 +38,11 @@ def next_sequence(memory_dir: Path) -> int:
 
 
 def load_template(skill_root: Path) -> str:
-    return (skill_root / "assets" / "memory.template.md").read_text(encoding="utf-8")
+    return load_named_template(skill_root, "memory.template.md")
+
+
+def load_named_template(skill_root: Path, name: str) -> str:
+    return (skill_root / "assets" / name).read_text(encoding="utf-8")
 
 
 def render(template: str, replacements: dict[str, str]) -> str:
@@ -45,6 +50,39 @@ def render(template: str, replacements: dict[str, str]) -> str:
     for key, value in replacements.items():
         rendered = rendered.replace(f"{{{{{key}}}}}", value)
     return rendered
+
+
+def safe_print(message: str) -> None:
+    encoding = sys.stdout.encoding or "utf-8"
+    sys.stdout.buffer.write((message + "\n").encode(encoding, errors="backslashreplace"))
+
+
+def write_if_missing(path: Path, content: str) -> None:
+    if not path.exists():
+        path.write_text(content, encoding="utf-8")
+
+
+def ensure_context_files(root: Path, generated_at: str, skill_root: Path) -> None:
+    psych_dir = root / ".psychRules"
+    memory_dir = psych_dir / "memory"
+    replacements = {
+        "PROJECT_NAME": root.name,
+        "ROOT_KIND": "project",
+        "ROOT_PATH": str(root),
+        "GENERATED_AT": generated_at,
+        "TITLE": "Psych Rules Memory Entry",
+        "KIND": "note",
+        "SEQUENCE": "00",
+    }
+
+    write_if_missing(
+        psych_dir / "session.md",
+        render(load_named_template(skill_root, "session.template.md"), replacements),
+    )
+    write_if_missing(
+        memory_dir / "index.md",
+        render(load_named_template(skill_root, "memory-index.template.md"), replacements),
+    )
 
 
 def main() -> None:
@@ -69,6 +107,7 @@ def main() -> None:
     filename = f"{args.kind}{seq:02d}_{slugify(args.title)}.md"
     generated_at = datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
     skill_root = Path(__file__).resolve().parents[1]
+    ensure_context_files(root, generated_at, skill_root)
 
     content = render(
         load_template(skill_root),
@@ -83,10 +122,11 @@ def main() -> None:
 
     target = memory_dir / filename
     target.write_text(content, encoding="utf-8")
-    print(target)
+    safe_print(str(target))
     commit_type = suggest_commit_type(args.kind)
     commit_subject = slugify(args.title).replace("-", " ")
-    print(f"suggested_commit={commit_type}({args.scope}): {commit_subject}")
+    safe_print(f"suggested_commit={commit_type}({args.scope}): {commit_subject}")
+    safe_print("reminder=sync session.md for active work and promote durable takeaways into memory/index.md")
 
 
 if __name__ == "__main__":

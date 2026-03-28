@@ -8,6 +8,13 @@
 - `.psychRules/` 可能包含敏感信息，默认不纳入版本控制。
 - git commit 标题默认使用英文 conventional commit 风格。
 
+## 启动读取协议
+
+- 开始实质性工作前，先阅读 `.psychRules/basic.md` 和 `.psychRules/rules.md`。
+- 如果存在 `.psychRules/session.md`，再读取它作为当前任务的热上下文。
+- 默认不要通读 `.psychRules/memory/` 下的所有文件。
+- 当任务涉及历史决策、旧问题复现、接续上次工作时，先看 `.psychRules/memory/index.md`，再按需打开相关 memory 记录。
+
 ## 常用命令
 
 - 启动命令：
@@ -22,9 +29,18 @@
 
 ## 质量规则
 
-- 在进行实质性工作前先阅读 `.psychRules/basic.md` 和本文件。
-- 发现稳定的环境、架构、命令、风险信息后，及时回写到 `.psychRules/`。
-- 每次有意义的 `debug`、`fix`、`feat`、`refactor` 或 `note` 会话，都要创建一条 memory。
+- 发现稳定的环境、架构、命令、风险信息后，及时回写到 `.psychRules/basic.md` 或 `.psychRules/rules.md`。
+- `session.md` 只保留活跃工作上下文，不要把长期稳定事实写进去。
+- `memory/index.md` 只记录高价值、可复用、长期有效的结论，不要堆砌流水账。
+- 每次有意义的 `debug`、`fix`、`feat`、`refactor` 或 `note` 会话，都要创建一条详细 memory。
+- 写完详细 memory 后，把真正值得长期保留的 1 到 3 条结论同步到 `memory/index.md`。
+
+## Session 与 Memory 规则
+
+- `session.md` 记录当前目标、阻塞点、下一步、正在处理的文件和最近决策。
+- 一个任务结束、切换或失效后，及时刷新 `session.md`，避免把过期信息留在热上下文里。
+- `memory/*.md` 记录每次会话的完整背景、改动、验证和后续事项。
+- 如果某次会话仍在继续，把当前阶段性结论同步到 `session.md`。
 
 ## Memory 与 Commit 同步规则
 
